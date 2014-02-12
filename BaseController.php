@@ -12,45 +12,49 @@ abstract class BaseController extends FOSRestController implements ClassResource
     protected $bundleName = "PppdnsGeneralBundle";
     public    $entityName;
 
-    // ACTION NAMES START WITH AN UNDERSCORE SINCE
-    // PHP DOESN'T SUPPORT TYPEHINT SPECIALIZATIONS IN INHERITANCE
 
     // CREATE
-    protected function _postAction() {
+    public function postAction() {
         $entity = $this->getNewEntity();
-        return $this->_saveAction($entity);
+        return $this->saveAction($entity);
     }
 
     // READ
-    protected function _getAction($entity) {
+    public function getAction($id) {
+        $entity = $this->getRepository()->find($id);
         return $this->handleView($this->view($entity));
     }
 
     // READ
-    protected function _cgetAction() {
+    public function cgetAction() {
         $entities = $this->getRepository()->findAll();
         return $this->handleView($this->view($entities));
     }
 
     // UPDATE
-    protected function _patchAction($entity) {
-        return $this->_saveAction($entity);
+    public function patchAction($id) {
+        $entity = $this->getRepository()->find($id);
+        return $this->saveAction($entity);
     }
 
     // UPDATE
-    protected function _putAction($entity) {
-        return $this->_saveAction($entity);
+    public function putAction($id) {
+        $entity = $this->getRepository()->find($id);
+        return $this->saveAction($entity);
     }
 
     // DELETE
-    protected function _deleteAction($entity) {
+    public function deleteAction($id) {
+        $entity = $this->getRepository()->find($id);
         $this->getEm()->remove($entity);
         $this->getEm()->flush();
         return $this->handleView($this->view(null, 204));
     }
 
+    // ------------------------------------------------------
 
-    protected function _saveAction($entity) {
+
+    protected function saveAction($entity) {
         $view = $this->view();
         $form = $this->createForm($this->getNewForm(), $entity);
 
@@ -63,6 +67,7 @@ abstract class BaseController extends FOSRestController implements ClassResource
         }
         else {
             $view->setData($form->getErrors());
+//            $view->setData($this->get('validator')->validate($entity));
             $view->setStatusCode(400);
         }
         return $this->handleView($view);

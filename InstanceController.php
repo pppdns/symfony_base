@@ -14,30 +14,4 @@ class InstanceController extends BaseController
     protected function getNewEntity() { return new Instance(); }
     protected function getNewForm() { return new InstanceType(); }
 
-
-
-    public function getAction(Instance $entity) {
-        return parent::_getAction($entity);
-    }
-
-    public function cgetAction() {
-        return parent::_cgetAction();
-    }
-
-    public function postAction() {
-        return parent::_postAction();
-    }
-
-    public function patchAction() {
-        return parent::_patchAction();
-    }
-
-    public function putAction() {
-        return parent::_putAction();
-    }
-
-    public function deleteAction(Instance $entity) {
-        return parent::_deleteAction($entity);
-    }
-
 }
