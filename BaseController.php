@@ -4,6 +4,7 @@ namespace Pppdns\GeneralBundle\Controller;
 
 use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\Routing\ClassResourceInterface;
+use JMS\Serializer\SerializationContext;
 
 abstract class BaseController extends FOSRestController implements ClassResourceInterface {
 
@@ -11,7 +12,6 @@ abstract class BaseController extends FOSRestController implements ClassResource
     protected $repository;
     protected $bundleName = "PppdnsGeneralBundle";
     public    $entityName;
-
 
     // CREATE
     public function postAction() {
@@ -21,8 +21,8 @@ abstract class BaseController extends FOSRestController implements ClassResource
 
     // READ
     public function getAction($id) {
-        $entity = $this->getRepository()->find($id);
-        return $this->handleView($this->view($entity));
+        $entity = $this->find($id);
+        return $this->returnOneAction($entity);
     }
 
     // READ
@@ -33,19 +33,19 @@ abstract class BaseController extends FOSRestController implements ClassResource
 
     // UPDATE
     public function patchAction($id) {
-        $entity = $this->getRepository()->find($id);
+        $entity = $this->find($id);
         return $this->saveAction($entity);
     }
 
     // UPDATE
     public function putAction($id) {
-        $entity = $this->getRepository()->find($id);
+        $entity = $this->find($id);
         return $this->saveAction($entity);
     }
 
     // DELETE
     public function deleteAction($id) {
-        $entity = $this->getRepository()->find($id);
+        $entity = $this->find($id);
         $this->getEm()->remove($entity);
         $this->getEm()->flush();
         return $this->handleView($this->view(null, 204));
@@ -71,6 +71,23 @@ abstract class BaseController extends FOSRestController implements ClassResource
             $view->setStatusCode(400);
         }
         return $this->handleView($view);
+    }
+
+    public function returnOneAction($entity) {
+        if (!$entity) {
+            throw $this->createNotFoundException();
+        }
+        return $this->handleView($this->view($entity)->setSerializationContext(
+            SerializationContext::create()->enableMaxDepthChecks()->setGroups('details')
+        ));
+    }
+
+    protected function find($id) {
+        $entity = $this->getRepository()->find($id);
+        if (!$entity) {
+            throw $this->createNotFoundException();
+        }
+        return $entity;
     }
 
     protected function getRepository() {
